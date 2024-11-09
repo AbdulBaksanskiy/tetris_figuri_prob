@@ -1,6 +1,6 @@
 #include "Arduino_LED_Matrix.h"
-ArduinoLEDMatrix matrix;    
-int x=11;
+ArduinoLEDMatrix matrix;
+int x = 11;
 int y = 3;
 int up, down;
 int cnt;
@@ -10,7 +10,8 @@ int score = 0;
 int p = 50;
 int ax = 1;
 int pov;
-int step=0;
+int step = 0;
+int l;
 byte angle = 1;
 uint8_t frame[8][12] = {
   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -90,6 +91,8 @@ void udaleniye_stroki() {
   }
 }
 void move_y() {
+  if ((angle == 1) || (angle == 3)) l=5;
+  if ((angle == 2) || (angle == 4)) l=6;
   if (digitalRead(1) == 0) {
     if (up == 0)
       if ((y > 0))
@@ -98,105 +101,61 @@ void move_y() {
   } else up = 0;
   if (digitalRead(2) == 0) {
     if (down == 0)
-      if ((y < 7))
+      if ((y < l))
         y++;
     down = 1;
   } else down = 0;
 }
-bool risovat() {
-  byte tmp_f[8][12];
-  for (int i = 0; i < 8; i++)
-    for (int j = 0; j < 12; j++)
-      tmp_f[i][j] = frame[i][j];
-  //Рисуем фигуру
+bool ris_uda(int data) {
+  if (data == 0)
+    for (int i = 0; i < 8; i++)
+      for (int j = 0; j < 12; j++)
+        frame_bd[i][j] = frame[i][j];
   for (int i = 0; i < 3; i++)
     for (int j = 0; j < 2; j++)
       switch (angle) {
         case 1:
           {
             if ((ggg[i][j] == 1) && ((y + i) <= 7) && ((x + j) <= 11))
-              tmp_f[y + i][x + j] = 1;
+              frame[y + i][x + j] = data;
             break;
           }
         case 2:
           {
             if ((ggg[2 - i][j] == 1) && ((y + j) <= 7) && ((x + i) <= 11))
-              tmp_f[y + j][x + i] = 1;
+              frame[y + j][x + i] = data;
             break;
           }
         case 3:
           {
             if ((ggg[2 - i][1 - j] == 1) && ((y + i) <= 7) && ((x + j) <= 11))
-              tmp_f[y + i][x + j] = 1;
+              frame[y + i][x + j] = data;
             break;
           }
         case 4:
           {
             if ((ggg[i][1 - j] == 1) && ((y + j) <= 7) && ((x + i) <= 11))
-              tmp_f[y + j][x + i] = 1;
+              frame[y + j][x + i] = data;
             break;
           }
       }
-  //конец
-  byte tmp_cnt = 0;
-  for (int i = 0; i < 8; i++)
-    for (int j = 0; j < 12; j++)
-      if (tmp_f[i][j] == 1)
-        tmp_cnt++;
-  byte frame_cnt = 0;
-  for (int i = 0; i < 8; i++)
-    for (int j = 0; j < 12; j++)
-      if (frame_bd[i][j] == 1)
-        frame_cnt++;
-   Serial.print("Новых");
-   Serial.println(tmp_cnt);
-   Serial.print("Старых");
-   Serial.println(frame_cnt);
-   
-  if (tmp_cnt >= frame_cnt) {
+  int cnt_f = 0;
+  int cnt_f_bd = 0;
+  if (data == 1) {
     for (int i = 0; i < 8; i++)
-      for (int j = 0; j < 12; j++)
-        frame[i][j] = tmp_f[i][j];
-    return true;
-  } else {
+      for (int j = 0; j < 12; j++) {
+        if (frame[i][j] == 1)
+          cnt_f++;
+        if (frame_bd[i][j] == 1)
+          cnt_f_bd++;
+      }
+  }
+  if (cnt_f_bd > cnt_f) {
     for (int i = 0; i < 8; i++)
       for (int j = 0; j < 12; j++)
         frame[i][j] = frame_bd[i][j];
     return false;
-  }
-}
-void udalat() {
-  for (int i = 0; i < 8; i++)
-    for (int j = 0; j < 12; j++)
-      frame_bd[i][j] = frame[i][j];
-  for (int i = 0; i < 3; i++)
-    for (int j = 0; j < 2; j++)
-      switch (angle) {
-        case 1:
-          {
-            if ((ggg[i][j] == 1) && ((y + i) <= 7) && ((x + j) <= 11))
-              frame[y + i][x + j] = 0;
-            break;
-          }
-        case 2:
-          {
-            if ((ggg[2 - i][j] == 1) && ((y + j) <= 7) && ((x + i) <= 11))
-              frame[y + j][x + i] = 0;
-            break;
-          }
-        case 3:
-          {
-            if ((ggg[2 - i][1 - j] == 1) && ((y + i) <= 7) && ((x + j) <= 11))
-              frame[y + i][x + j] = 0;
-            break;
-          }
-        case 4:
-          {
-            if ((ggg[i][1 - j] == 1) && ((y + j) <= 7) && ((x + i) <= 11))
-              frame[y + j][x + i] = 0;
-            break;
-          }
-      }
+  } else return true;
 }
 void povorot() {
   if (digitalRead(10) == 0) {
@@ -218,8 +177,7 @@ void setup() {
   pinMode(10, INPUT_PULLUP);
 }
 void loop() {
-  udalat();
-  // cnt = 0;
+  ris_uda(0);
   i++;
   if (i >= (p * ax + 5)) {
     x--;
@@ -229,7 +187,7 @@ void loop() {
   pi_plus();
   game_over();
   povorot();
-  bool stat = risovat();
+  bool stat = ris_uda(1);
   Serial.println(stat);
   step++;
   Serial.println(step);
@@ -237,7 +195,8 @@ void loop() {
     udaleniye_stroki();
     x = 11;
     y = 3;
-    risovat();
+    ris_uda(0);
+    ris_uda(1);
   }
   matrix.renderBitmap(frame, 8, 12);
   delay(10);
