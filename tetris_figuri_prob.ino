@@ -194,7 +194,7 @@ void loop() {
   step++;
   Serial.println(step);  
   if ((x <= 0) || (!stat)) {
-    udaleniye_stroki();
+    udaleniye_stroki();    
     x = 11;
     y = 3;
     ris_uda(0);
