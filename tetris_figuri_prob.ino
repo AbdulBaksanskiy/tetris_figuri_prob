@@ -13,6 +13,9 @@ int pov;
 int step = 0;
 int l;
 byte angle = 1;
+int rnd;
+char mak=8;
+char mini=0;
 uint8_t frame[8][12] = {
   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
