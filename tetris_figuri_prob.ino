@@ -33,7 +33,7 @@ uint8_t frame_bd[8][12] = {
   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
-byte frame2[8][12] = {
+uint8_t frame2[8][12] = {
   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
   { 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0 },
   { 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1 },
@@ -43,10 +43,14 @@ byte frame2[8][12] = {
   { 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0 },
   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
-byte ggg[3][2] = {
+uint8_t ggg[3][2] = {
   { 1, 1 },
   { 1, 0 },
   { 1, 0 },
+};
+uint8_t kv[2][2] = {
+  { 1, 1 },
+  { 1, 1 },
 };
 void pi_plus() {
   if (digitalRead(5) == 0)
@@ -74,20 +78,23 @@ void ball() {
   Serial.println("!!!");
 }
 void udaleniye_stroki() {
-  cnt = 0;
-  for (int a = 0; a < 8; a++) {
-    if (frame[a][0] == 1)
-      cnt++;
-    else
-      break;
-  }
-  if (cnt == 8) {
-    for (int z = 0; z < 8; z++) {
-      for (int j = 1; j < 12; j++)
-        frame[z][j - 1] = frame[z][j];
-      frame[z][11] = 0;
+  for (int i = 0; i < 10; i++) {
+    cnt = 0;
+    for (int a = 0; a < 8; a++) {
+      if (frame[a][i] == 1)
+        cnt++;
+      else
+        break;
     }
-    ball();
+    if (cnt == 8) {
+      for (int z = 0; z < 8; z++) {
+        for (int j = i; j < 11; j++)
+          frame[z][j] = frame[z][j+1];
+        frame[z][11] = 0;
+      }
+      ball();
+      i--;
+    }
   }
 }
 void move_y() {
@@ -190,11 +197,12 @@ void loop() {
   game_over();
   povorot();
   bool stat = ris_uda(1);
-  Serial.println(stat);
+  // Serial.println(stat);
   step++;
-  Serial.println(step);  
+  // Serial.println(step);
+     
   if ((x <= 0) || (!stat)) {
-    udaleniye_stroki();    
+    udaleniye_stroki();
     x = 11;
     y = 3;
     ris_uda(0);
