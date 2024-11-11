@@ -192,8 +192,8 @@ void loop() {
   bool stat = ris_uda(1);
   Serial.println(stat);
   step++;
-  Serial.println(step);
-  if ((x <= 0) || (frame[y][x - 1] == 1) || (!stat)) {
+  Serial.println(step);  
+  if ((x <= 0) || (!stat)) {
     udaleniye_stroki();
     x = 11;
     y = 3;
