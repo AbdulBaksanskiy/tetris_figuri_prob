@@ -1,5 +1,19 @@
 #include "Arduino_LED_Matrix.h"
 ArduinoLEDMatrix matrix;
+struct Figures {
+  byte w, h;
+  byte matrix[4][2];
+};
+Figures g[7] = {
+  { 2, 3, { { 1, 0 }, { 1, 0 }, { 1, 1 }, { 0, 0 } } },
+  { 2, 3, { { 0, 1 }, { 0, 1 }, { 1, 1 }, { 0, 0 } } },
+  { 2, 3, { { 1, 0 }, { 1, 1 }, { 0, 1 }, { 0, 0 } } },
+  { 2, 3, { { 0, 1 }, { 1, 1 }, { 1, 0 }, { 0, 0 } } },
+  { 2, 3, { { 1, 0 }, { 1, 1 }, { 1, 0 }, { 0, 0 } } },
+  { 1, 4, { { 1, 0 }, { 1, 0 }, { 1, 0 }, { 1, 0 } } },
+  { 2, 2, { { 1, 1 }, { 1, 1 }, { 0, 0 }, { 0, 0 } } }
+};
+byte fn = random(6);
 int x = 11;
 int y = 3;
 int up, down;
@@ -13,9 +27,6 @@ int pov;
 int step = 0;
 int l;
 byte angle = 1;
-int rnd;
-char mak=8;
-char mini=0;
 uint8_t frame[8][12] = {
   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -45,15 +56,6 @@ uint8_t frame2[8][12] = {
   { 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0 },
   { 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0 },
   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-};
-uint8_t ggg[3][2] = {
-  { 1, 1 },
-  { 1, 0 },
-  { 1, 0 },
-};
-uint8_t kv[2][2] = {
-  { 1, 1 },
-  { 1, 1 },
 };
 void pi_plus() {
   if (digitalRead(5) == 0)
@@ -92,7 +94,7 @@ void udaleniye_stroki() {
     if (cnt == 8) {
       for (int z = 0; z < 8; z++) {
         for (int j = i; j < 11; j++)
-          frame[z][j] = frame[z][j+1];
+          frame[z][j] = frame[z][j + 1];
         frame[z][11] = 0;
       }
       ball();
@@ -121,30 +123,30 @@ bool ris_uda(int data) {
     for (int i = 0; i < 8; i++)
       for (int j = 0; j < 12; j++)
         frame_bd[i][j] = frame[i][j];
-  for (int i = 0; i < 3; i++)
-    for (int j = 0; j < 2; j++)
+  for (int i = 0; i < g[fn].h; i++)
+    for (int j = 0; j < g[fn].w; j++)
       switch (angle) {
         case 1:
           {
-            if ((ggg[i][j] == 1) && ((y + i) <= 7) && ((x + j) <= 11))
+            if ((g[fn].matrix[i][j] == 1) && ((y + i) <= 7) && ((x + j) <= 11))
               frame[y + i][x + j] = data;
             break;
           }
         case 2:
           {
-            if ((ggg[2 - i][j] == 1) && ((y + j) <= 7) && ((x + i) <= 11))
+            if ((g[fn].matrix[g[fn].h - 1 - i][j] == 1) && ((y + j) <= 7) && ((x + i) <= 11))
               frame[y + j][x + i] = data;
             break;
           }
         case 3:
           {
-            if ((ggg[2 - i][1 - j] == 1) && ((y + i) <= 7) && ((x + j) <= 11))
+            if ((g[fn].matrix[g[fn].h - 1 - i][g[fn].w - 1 - j] == 1) && ((y + i) <= 7) && ((x + j) <= 11))
               frame[y + i][x + j] = data;
             break;
           }
         case 4:
           {
-            if ((ggg[i][1 - j] == 1) && ((y + j) <= 7) && ((x + i) <= 11))
+            if ((g[fn].matrix[i][g[fn].w - 1 - j] == 1) && ((y + j) <= 7) && ((x + i) <= 11))
               frame[y + j][x + i] = data;
             break;
           }
@@ -187,7 +189,7 @@ void setup() {
   pinMode(2, INPUT_PULLUP);
   pinMode(5, INPUT_PULLUP);
   pinMode(10, INPUT_PULLUP);
-}
+};
 void loop() {
   ris_uda(0);
   i++;
@@ -203,11 +205,12 @@ void loop() {
   // Serial.println(stat);
   step++;
   // Serial.println(step);
-     
+
   if ((x <= 0) || (!stat)) {
     udaleniye_stroki();
     x = 11;
     y = 3;
+    fn= random(6);
     ris_uda(0);
     ris_uda(1);
   }
