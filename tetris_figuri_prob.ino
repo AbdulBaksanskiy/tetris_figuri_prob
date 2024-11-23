@@ -104,19 +104,17 @@ void udaleniye_stroki() {
   }
 }
 void move_y() {
-  for (int i = 0; i < 8; i++)
-      for (int j = 0; j < 12; j++)
   if ((angle == 1) || (angle == 3)) l = g[fn].my1;
   if ((angle == 2) || (angle == 4)) l = g[fn].my2;
   if (digitalRead(1) == 0) {
     if (up == 0)
-      if ((y > 0)%%())
+      if (y > 0)
         y--;
     up = 1;
   } else up = 0;
   if (digitalRead(2) == 0) {
     if (down == 0)
-      if ((y < l))
+      if \(y < l)
         y++;
     down = 1;
   } else down = 0;
